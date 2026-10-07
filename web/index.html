@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GAAS — Sign in</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<script>
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+</script>
+<script type="module" src="./ui.js"></script>
+<body>
+  <div class="wrap" style="max-width: 420px; padding-top: 96px;">
+    <h1>Grid Attendance</h1>
+    <p class="subtitle">Sign in with the account provisioned for you.</p>
+
+    <div class="card">
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="username" />
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" />
+      <p class="error" id="error" style="display:none;"></p>
+      <button id="loginBtn" style="width:100%;">Sign in</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { login, watchAuth } from './firebaseClient.js';
+
+    const errorEl = document.getElementById('error');
+
+    function routeForRole(role) {
+      if (role === 'teacher') window.location.href = 'teacher.html';
+      else if (role === 'student') window.location.href = 'student.html';
+    }
+
+    // If already signed in, skip straight to the right page.
+    watchAuth((user, role) => { if (user && role) routeForRole(role); });
+
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      errorEl.style.display = 'none';
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      try {
+        const { role } = await login(email, password);
+        if (!role) {
+          errorEl.textContent = 'Signed in, but this account has no role set. Run scripts/setRole.js for this account.';
+          errorEl.style.display = 'block';
+          return;
+        }
+        routeForRole(role);
+      } catch (err) {
+        errorEl.textContent = err.message.replace('Firebase: ', '');
+        errorEl.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+<script>
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+</script>
+</html>

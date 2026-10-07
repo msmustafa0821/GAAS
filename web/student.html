@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>GAAS — Student</title>
+
+  <link rel="stylesheet" href="style.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<script>
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+</script>
+<script type="module" src="./ui.js"></script>
+<script type="module" src="./qr.js"></script>
+<body>
+
+  <div class="wrap">
+
+    <h1 id="greeting">Student</h1>
+
+    <p class="subtitle">
+      Enter the active session and your grid ID to complete the attendance handshake.
+    </p>
+
+    <div class="card">
+
+      <label for="sessionId">Session ID</label>
+
+      <input
+        id="sessionId"
+        placeholder="e.g. 8f2kQ1..."
+        autocomplete="off"
+      />
+
+      <label for="gridId">Grid ID</label>
+
+      <input
+        id="gridId"
+        placeholder="e.g. R1-B1"
+        style="text-transform: uppercase;"
+        autocomplete="off"
+      />
+
+      <p
+        class="error"
+        id="error"
+        style="display:none;"
+      ></p>
+
+      <button
+        id="submitBtn"
+        style="width:100%;"
+      >
+        Submit handshake
+      </button>
+
+    </div>
+
+    <div class="card">
+
+      <p class="section-label">
+        Your status this session
+      </p>
+
+      <div
+        class="status-line"
+        id="statusLine"
+      >
+        Not scanned yet
+      </div>
+
+    </div>
+
+    <button
+      class="link"
+      id="logoutBtn"
+    >
+      Sign out
+    </button>
+
+  </div>
+
+
+  <script type="module">
+
+    import {
+      watchAuth,
+      submitHandshake,
+      listenToMyAttendance,
+      logout
+    } from './firebaseClient.js';
+
+
+    let unsubscribeAttendance = null;
+
+
+    const errorEl =
+      document.getElementById('error');
+
+    const statusLine =
+      document.getElementById('statusLine');
+
+    const submitBtn =
+      document.getElementById('submitBtn');
+
+
+    /*
+     * AUTH
+     */
+
+    watchAuth((user, role) => {
+
+      if (!user) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      if (role !== 'student') {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      document.getElementById('greeting').textContent =
+        user.email;
+
+    });
+
+
+    /*
+     * HANDSHAKE
+     */
+
+    submitBtn.addEventListener('click', async () => {
+
+      errorEl.style.display = 'none';
+
+      const sessionId =
+        document
+          .getElementById('sessionId')
+          .value
+          .trim();
+
+      const gridId =
+        document
+          .getElementById('gridId')
+          .value
+          .trim()
+          .toUpperCase();
+
+
+      if (!sessionId || !gridId) {
+
+        errorEl.textContent =
+          'Enter both a session ID and a grid ID.';
+
+        errorEl.style.display = 'block';
+
+        return;
+      }
+
+
+      try {
+
+        /*
+         * IMPORTANT:
+         * Start the realtime listener FIRST.
+         */
+
+        if (unsubscribeAttendance) {
+          unsubscribeAttendance();
+          unsubscribeAttendance = null;
+        }
+
+
+        unsubscribeAttendance =
+          listenToMyAttendance(
+            sessionId,
+            (data) => {
+
+              console.log(
+                'STUDENT REALTIME ATTENDANCE:',
+                data
+              );
+
+
+              if (!data) {
+
+                statusLine.className =
+                  'status-line';
+
+                statusLine.textContent =
+                  `Claimed grid ${gridId} — waiting for teacher...`;
+
+                return;
+              }
+
+
+              statusLine.className =
+                'status-line ' +
+                (data.status || '');
+
+
+              if (data.status === 'present') {
+
+                statusLine.textContent =
+                  `Present — grid ${data.gridId || gridId}`;
+
+              } else if (data.status === 'absent') {
+
+                statusLine.textContent =
+                  `Marked absent — grid ${data.gridId || gridId}`;
+
+              } else {
+
+                statusLine.textContent =
+                  `Status: ${data.status}`;
+
+              }
+
+            }
+          );
+
+
+        /*
+         * NOW send the handshake.
+         */
+
+        await submitHandshake(
+          sessionId,
+          gridId
+        );
+
+
+        statusLine.className =
+          'status-line';
+
+        statusLine.textContent =
+          `Claimed grid ${gridId} — waiting for teacher...`;
+
+
+        console.log(
+          'HANDSHAKE SENT:',
+          {
+            sessionId,
+            gridId
+          }
+        );
+
+
+      } catch (err) {
+
+        console.error(
+          'HANDSHAKE ERROR:',
+          err
+        );
+
+
+        if (unsubscribeAttendance) {
+
+          unsubscribeAttendance();
+          unsubscribeAttendance = null;
+
+        }
+
+
+        errorEl.textContent =
+          err.message
+            .replace('Firebase: ', '');
+
+
+        errorEl.style.display =
+          'block';
+
+      }
+
+    });
+
+
+    /*
+     * LOGOUT
+     */
+
+    document
+      .getElementById('logoutBtn')
+      .addEventListener(
+        'click',
+        () => logout()
+      );
+
+  </script>
+
+</body>
+</html>

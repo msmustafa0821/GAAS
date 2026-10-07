@@ -1,0 +1,4547 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>GAAS — Teacher</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+
+    /* ================================
+       EXTRA TEACHER PAGE STYLES
+    ================================= */
+
+    .home-grid,
+    .about-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .feature-card,
+    .detail-card {
+      padding: 22px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .feature-card h3,
+    .detail-card h3 {
+      margin-bottom: 7px;
+    }
+
+    .feature-card p,
+    .detail-card p {
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .feature-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 16px;
+    }
+
+    .secondary-btn {
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 9px 13px;
+      background: #fff;
+      color: #111827;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 600;
+    }
+
+    .secondary-btn:hover {
+      background: #f9fafb;
+    }
+
+    .detail-row {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 15px;
+      padding: 11px 0;
+      border-bottom: 1px solid #f0f1f3;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      color: #6b7280;
+      font-size: 13px;
+    }
+
+    .detail-value {
+      min-width: 0;
+      overflow-wrap: anywhere;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .student-details-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .student-detail-item {
+      padding: 14px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .student-detail-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .student-detail-item small {
+      display: block;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+
+    /* ================================
+       GRID COLORS
+    ================================= */
+
+    .grid-seat.present {
+      background: #16a34a !important;
+      border-color: #15803d !important;
+      color: white !important;
+    }
+
+    .grid-seat.present strong,
+    .grid-seat.present small {
+      color: white !important;
+    }
+
+    .grid-seat.claimed {
+      background: #facc15 !important;
+      border-color: #eab308 !important;
+      color: #713f12 !important;
+    }
+
+    .grid-seat.claimed strong,
+    .grid-seat.claimed small {
+      color: #713f12 !important;
+    }
+
+    .grid-seat.absent {
+      background: #dc2626 !important;
+      border-color: #b91c1c !important;
+      color: white !important;
+    }
+
+    .grid-seat.absent strong,
+    .grid-seat.absent small {
+      color: white !important;
+    }
+
+    .grid-seat.collision {
+      background: #f97316 !important;
+      border-color: #ea580c !important;
+      color: white !important;
+    }
+
+    .grid-seat.collision strong,
+    .grid-seat.collision small {
+      color: white !important;
+    }
+
+    .grid-seat.empty {
+      background: #e5e7eb !important;
+      border-color: #d1d5db !important;
+      color: #374151 !important;
+    }
+
+    .grid-seat.empty strong,
+    .grid-seat.empty small {
+      color: #374151 !important;
+    }
+
+    .grid-seat {
+      transition:
+        background .18s ease,
+        border-color .18s ease,
+        transform .12s ease;
+    }
+
+    .grid-seat:hover {
+      transform: translateY(-2px);
+    }
+
+    /* ================================
+       ATTENDANCE PAGE
+    ================================= */
+
+    .attendance-summary {
+      padding: 18px;
+      margin-bottom: 18px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .attendance-summary h3 {
+      margin-bottom: 7px;
+    }
+
+    .attendance-summary p {
+      margin: 4px 0;
+      color: #6b7280;
+    }
+
+    .attendance-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .student-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .attendance-student {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 9px;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+    }
+
+    .attendance-student small {
+      color: #6b7280;
+      font-size: 11px;
+    }
+
+    .present-row {
+      background: #f0fdf4;
+      border-color: #86efac;
+    }
+
+    .absent-row {
+      background: #fef2f2;
+      border-color: #fca5a5;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+
+    .status-pill.present {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-pill.absent {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status-pill.neutral {
+      background: #f3f4f6;
+      color: #4b5563;
+    }
+
+    .live-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #166534;
+    }
+
+    .live-inline::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #16a34a;
+    }
+
+    @media (max-width: 900px) {
+      .home-grid,
+      .about-grid,
+      .attendance-columns {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .detail-row {
+        grid-template-columns: 1fr;
+        gap: 5px;
+      }
+    }
+
+  </style>
+</head>
+<script>
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+</script>
+<script type="module" src="./ui.js"></script>
+<body>
+
+<div class="app-shell">
+
+  <!-- =====================================================
+       SIDEBAR
+  ====================================================== -->
+
+  <aside class="sidebar">
+
+    <div class="brand">
+
+      <div class="brand-mark">
+        G
+      </div>
+
+      <div>
+        <strong>GAAS</strong>
+        <span>Teacher</span>
+      </div>
+
+    </div>
+
+
+    <nav class="sidebar-nav">
+
+      <button
+        class="nav-item active"
+        data-page="home"
+        type="button"
+      >
+        Home
+      </button>
+
+
+      <button
+        class="nav-item"
+        data-page="dashboard"
+        type="button"
+      >
+        Dashboard
+      </button>
+
+
+      <button
+        class="nav-item"
+        data-page="history"
+        type="button"
+      >
+        Previous Classes
+      </button>
+
+
+      <button
+        class="nav-item"
+        data-page="attendance"
+        type="button"
+      >
+        Attendance
+      </button>
+
+
+      <button
+        class="nav-item"
+        data-page="about"
+        type="button"
+      >
+        About
+      </button>
+
+    </nav>
+
+
+    <button
+      class="logout-btn"
+      id="logoutBtn"
+      type="button"
+    >
+      Sign out
+    </button>
+
+  </aside>
+
+
+  <!-- =====================================================
+       MAIN
+  ====================================================== -->
+
+  <main class="main-content">
+
+
+    <!-- TOP BAR -->
+
+    <header class="topbar">
+
+      <div>
+
+        <h2 id="pageTitle">
+          Home
+        </h2>
+
+        <p id="teacherEmail">
+          Teacher
+        </p>
+
+      </div>
+
+
+      <div class="teacher-status">
+        ● Online
+      </div>
+
+    </header>
+
+
+
+    <!-- ===================================================
+         HOME
+    ==================================================== -->
+
+    <section
+      id="homePage"
+      class="page"
+    >
+
+      <div class="page-heading">
+
+        <p class="eyebrow">
+          GAAS
+        </p>
+
+        <h2>
+          Teacher Home
+        </h2>
+
+        <p>
+          Access all GAAS features from one place.
+        </p>
+
+      </div>
+
+
+      <div class="home-grid">
+
+
+        <div class="feature-card">
+
+          <h3>
+            Dashboard
+          </h3>
+
+          <p>
+            Start or restore a live class, monitor the classroom grid,
+            handle collisions and manage attendance.
+          </p>
+
+          <div class="feature-actions">
+
+            <button
+              class="primary-btn home-nav-btn"
+              data-target="dashboard"
+              type="button"
+            >
+              Open Dashboard
+            </button>
+
+          </div>
+
+        </div>
+
+
+
+        <div class="feature-card">
+
+          <h3>
+            Previous Classes
+          </h3>
+
+          <p>
+            View completed sessions and open the final attendance
+            records of previous classes.
+          </p>
+
+          <div class="feature-actions">
+
+            <button
+              class="secondary-btn home-nav-btn"
+              data-target="history"
+              type="button"
+            >
+              Open Previous Classes
+            </button>
+
+          </div>
+
+        </div>
+
+
+
+        <div class="feature-card">
+
+          <h3>
+            Attendance
+          </h3>
+
+          <p>
+            View live attendance for the active class or attendance
+            selected from a previous class.
+          </p>
+
+          <div class="feature-actions">
+
+            <button
+              class="secondary-btn home-nav-btn"
+              data-target="attendance"
+              type="button"
+            >
+              Open Attendance
+            </button>
+
+          </div>
+
+        </div>
+
+
+
+        <div class="feature-card">
+
+          <h3>
+            About
+          </h3>
+
+          <p>
+            View the teacher account, current session and student
+            details connected to the current roster.
+          </p>
+
+          <div class="feature-actions">
+
+            <button
+              class="secondary-btn home-nav-btn"
+              data-target="about"
+              type="button"
+            >
+              Open About
+            </button>
+
+          </div>
+
+        </div>
+
+
+
+        <div class="feature-card">
+
+          <h3>
+            Sign out
+          </h3>
+
+          <p>
+            Sign out safely from the teacher account.
+          </p>
+
+          <div class="feature-actions">
+
+            <button
+              class="danger-btn"
+              id="homeLogoutBtn"
+              type="button"
+            >
+              Sign out
+            </button>
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         DASHBOARD
+    ==================================================== -->
+
+    <section
+      id="dashboardPage"
+      class="page"
+      style="display:none;"
+    >
+
+
+      <!-- START SESSION -->
+
+      <div
+        id="startCard"
+        class="card"
+      >
+
+        <div class="card-header">
+
+          <div>
+
+            <p class="eyebrow">
+              NEW SESSION
+            </p>
+
+            <h2>
+              Start attendance
+            </h2>
+
+          </div>
+
+        </div>
+
+
+        <div class="form-grid">
+
+
+          <div class="form-group">
+
+            <label for="courseId">
+              Course ID
+            </label>
+
+            <input
+              id="courseId"
+              placeholder="e.g. CSE301"
+              autocomplete="off"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="rows">
+              Rows
+            </label>
+
+            <input
+              id="rows"
+              type="number"
+              min="1"
+              value="4"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="benches">
+              Benches per row
+            </label>
+
+            <input
+              id="benches"
+              type="number"
+              min="1"
+              value="5"
+            >
+
+          </div>
+
+
+        </div>
+
+
+        <p
+          id="startError"
+          class="error-box"
+          style="display:none;"
+        ></p>
+
+
+        <div class="form-actions">
+
+          <button
+            id="startBtn"
+            class="primary-btn"
+            type="button"
+          >
+            Start Session
+          </button>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- ACTIVE SESSION -->
+
+      <div
+        id="liveSection"
+        class="live-section"
+        style="display:none;"
+      >
+
+
+        <div class="live-header">
+
+          <div>
+
+            <p class="eyebrow">
+              LIVE SESSION
+            </p>
+
+            <h2 id="liveCourse">
+              Attendance
+            </h2>
+
+            <p>
+              Session ID:
+              <strong id="sessionIdDisplay"></strong>
+            </p>
+
+          </div>
+
+
+          <div class="session-status">
+
+            <span class="live-dot"></span>
+
+            ACTIVE
+
+          </div>
+
+        </div>
+
+
+
+        <!-- STATS -->
+
+        <div class="stats-grid">
+
+          <div class="stat-card">
+
+            <span>
+              Present
+            </span>
+
+            <strong id="presentCount">
+              0
+            </strong>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <span>
+              Total
+            </span>
+
+            <strong id="totalCount">
+              0
+            </strong>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <span>
+              Claims
+            </span>
+
+            <strong id="claimCount">
+              0
+            </strong>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- CLASSROOM GRID -->
+
+        <div class="card">
+
+          <div class="section-title">
+
+            <h3>
+              Classroom Grid
+            </h3>
+
+          </div>
+
+
+          <div
+            id="classroomGrid"
+            class="classroom-grid"
+          ></div>
+
+        </div>
+
+
+
+        <!-- COLLISION -->
+
+        <div
+          id="collisionCard"
+          class="card collision-card"
+          style="display:none;"
+        >
+
+          <div class="warning-icon">
+            ⚠
+          </div>
+
+
+          <div>
+
+            <h3>
+              Grid collision detected
+            </h3>
+
+            <p id="collisionText"></p>
+
+          </div>
+
+
+          <div
+            id="collisionActions"
+            class="collision-actions"
+          ></div>
+
+        </div>
+
+
+
+        <!-- MANUAL ATTENDANCE -->
+
+        <div class="card">
+
+          <div class="section-title">
+
+            <h3>
+              Manual Attendance
+            </h3>
+
+            <p>
+              Current live roster attendance.
+            </p>
+
+          </div>
+
+
+          <div
+            id="manualAttendance"
+            class="manual-student-list"
+          ></div>
+
+        </div>
+
+
+
+        <button
+          id="endBtn"
+          class="danger-btn"
+          type="button"
+        >
+          End Session
+        </button>
+
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         PREVIOUS CLASSES
+    ==================================================== -->
+
+    <section
+      id="historyPage"
+      class="page"
+      style="display:none;"
+    >
+
+      <div class="page-heading">
+
+        <p class="eyebrow">
+          RECORDS
+        </p>
+
+        <h2>
+          Previous Classes
+        </h2>
+
+        <p>
+          Completed attendance sessions.
+        </p>
+
+      </div>
+
+
+      <div
+        id="historyList"
+        class="history-list"
+      >
+
+        <div class="loading-box">
+          Loading...
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         ATTENDANCE
+    ==================================================== -->
+
+    <section
+      id="attendancePage"
+      class="page"
+      style="display:none;"
+    >
+
+      <div class="page-heading">
+
+        <p class="eyebrow">
+          ATTENDANCE
+        </p>
+
+        <h2>
+          Class Attendance
+        </h2>
+
+        <p id="attendanceSubheading">
+          Live attendance for the current class.
+        </p>
+
+      </div>
+
+
+      <div
+        id="attendanceDetails"
+        class="card"
+      >
+        No active class.
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         ABOUT
+    ==================================================== -->
+
+    <section
+      id="aboutPage"
+      class="page"
+      style="display:none;"
+    >
+
+      <div class="page-heading">
+
+        <p class="eyebrow">
+          ABOUT
+        </p>
+
+        <h2>
+          Teacher & User Details
+        </h2>
+
+        <p>
+          Account, session and student information.
+        </p>
+
+      </div>
+
+
+      <div class="about-grid">
+
+
+        <div class="detail-card">
+
+          <h3>
+            User Details
+          </h3>
+
+
+          <div class="detail-row">
+
+            <span class="detail-label">
+              Email
+            </span>
+
+            <span
+              class="detail-value"
+              id="aboutUserEmail"
+            >
+              —
+            </span>
+
+          </div>
+
+
+          <div class="detail-row">
+
+            <span class="detail-label">
+              UID
+            </span>
+
+            <span
+              class="detail-value"
+              id="aboutUserUid"
+            >
+              —
+            </span>
+
+          </div>
+
+
+          <div class="detail-row">
+
+            <span class="detail-label">
+              Role
+            </span>
+
+            <span
+              class="detail-value"
+              id="aboutUserRole"
+            >
+              Teacher
+            </span>
+
+          </div>
+
+
+          <div class="detail-row">
+
+            <span class="detail-label">
+              Status
+            </span>
+
+            <span class="detail-value">
+              Signed in
+            </span>
+
+          </div>
+
+        </div>
+
+
+
+        <div class="detail-card">
+
+          <h3>
+            Teacher Details
+          </h3>
+
+
+          <div class="detail-row">
+
+            <span class="detail-label">
+              Teacher ID
+            </span>
+
+            <span
+              class="detail-value"
+              id="aboutTeacherId"
+            >
+              —
+            </span>
+
+          </div>
+
+
+          <div class="detail-row">
+
+            <span class="detail-label">
+              Teacher Email
+            </span>
+
+            <span
+              class="detail-value"
+              id="aboutTeacherEmail"
+            >
+              —
+            </span>
+
+          </div>
+
+
+          <div class="detail-row">
+
+            <span class="detail-label">
+              Current Course
+            </span>
+
+            <span
+              class="detail-value"
+              id="aboutCourse"
+            >
+              No active class
+            </span>
+
+          </div>
+
+
+          <div class="detail-row">
+
+            <span class="detail-label">
+              Current Session
+            </span>
+
+            <span
+              class="detail-value"
+              id="aboutSession"
+            >
+              —
+            </span>
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+
+
+      <div
+        class="detail-card"
+        style="margin-top:18px;"
+      >
+
+        <h3>
+          Students Details
+        </h3>
+
+        <p id="aboutStudentsSummary">
+          Start or restore a class to load the current roster.
+        </p>
+
+
+        <div
+          id="aboutStudentsList"
+          class="student-details-list"
+        >
+
+          <div class="student-detail-item">
+
+            <strong>
+              No roster loaded
+            </strong>
+
+            <small>
+              Student details will appear here when an active class is available.
+            </small>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+</div>
+
+
+
+<script type="module">
+
+import {
+  watchAuth,
+  startSession,
+  endSession,
+  listenForClaims,
+  markProvisionalPresent,
+  markManualAttendance,
+  resolveCollision,
+  logout,
+  db,
+  getTeacherSessions
+} from './firebaseClient.js';
+
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  where
+} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
+
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let currentUser = null;
+
+let currentRole = null;
+
+let currentSessionId = null;
+
+let currentSession = null;
+
+let currentRoster = [];
+
+let attendanceMap = {};
+
+let claimsMap = {};
+
+let unsubscribeClaims = null;
+
+let unsubscribeAttendance = null;
+
+let selectedCollision = null;
+
+const provisionalWrites = new Set();
+
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const pages = {
+
+  home:
+    document.getElementById('homePage'),
+
+  dashboard:
+    document.getElementById('dashboardPage'),
+
+  history:
+    document.getElementById('historyPage'),
+
+  attendance:
+    document.getElementById('attendancePage'),
+
+  about:
+    document.getElementById('aboutPage')
+
+};
+
+
+const pageTitle =
+  document.getElementById(
+    'pageTitle'
+  );
+
+
+const teacherEmail =
+  document.getElementById(
+    'teacherEmail'
+  );
+
+
+const startCard =
+  document.getElementById(
+    'startCard'
+  );
+
+
+const liveSection =
+  document.getElementById(
+    'liveSection'
+  );
+
+
+const startError =
+  document.getElementById(
+    'startError'
+  );
+
+
+const sessionIdDisplay =
+  document.getElementById(
+    'sessionIdDisplay'
+  );
+
+
+const liveCourse =
+  document.getElementById(
+    'liveCourse'
+  );
+
+
+const classroomGrid =
+  document.getElementById(
+    'classroomGrid'
+  );
+
+
+const presentCount =
+  document.getElementById(
+    'presentCount'
+  );
+
+
+const totalCount =
+  document.getElementById(
+    'totalCount'
+  );
+
+
+const claimCount =
+  document.getElementById(
+    'claimCount'
+  );
+
+
+const collisionCard =
+  document.getElementById(
+    'collisionCard'
+  );
+
+
+const collisionText =
+  document.getElementById(
+    'collisionText'
+  );
+
+
+const collisionActions =
+  document.getElementById(
+    'collisionActions'
+  );
+
+
+const manualAttendance =
+  document.getElementById(
+    'manualAttendance'
+  );
+
+
+const attendanceDetails =
+  document.getElementById(
+    'attendanceDetails'
+  );
+
+
+const attendanceSubheading =
+  document.getElementById(
+    'attendanceSubheading'
+  );
+
+
+
+/* =========================================================
+   UTILITIES
+========================================================= */
+
+function escapeHtml(value) {
+
+  return String(
+    value ?? ''
+  )
+    .replace(
+      /&/g,
+      '&amp;'
+    )
+    .replace(
+      /</g,
+      '&lt;'
+    )
+    .replace(
+      />/g,
+      '&gt;'
+    )
+    .replace(
+      /"/g,
+      '&quot;'
+    )
+    .replace(
+      /'/g,
+      '&#039;'
+    );
+
+}
+
+
+function formatDate(timestamp) {
+
+  if (
+    !timestamp?.toDate
+  ) {
+
+    return 'Unknown time';
+
+  }
+
+  try {
+
+    return timestamp
+      .toDate()
+      .toLocaleString();
+
+  } catch {
+
+    return 'Unknown time';
+
+  }
+
+}
+
+
+function statusPill(status) {
+
+  if (
+    status ===
+    'present'
+  ) {
+
+    return `
+      <span class="status-pill present">
+        Present
+      </span>
+    `;
+
+  }
+
+
+  if (
+    status ===
+    'absent'
+  ) {
+
+    return `
+      <span class="status-pill absent">
+        Absent
+      </span>
+    `;
+
+  }
+
+
+  return `
+    <span class="status-pill neutral">
+      Not marked
+    </span>
+  `;
+
+}
+
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function setNavActive(page) {
+
+  document
+    .querySelectorAll(
+      '.nav-item'
+    )
+    .forEach(button => {
+
+      button.classList.toggle(
+        'active',
+        button.dataset.page ===
+        page
+      );
+
+    });
+
+}
+
+
+function updatePageTitle(page) {
+
+  const titles = {
+
+    home:
+      'Home',
+
+    dashboard:
+      'Dashboard',
+
+    history:
+      'Previous Classes',
+
+    attendance:
+      'Attendance',
+
+    about:
+      'About'
+
+  };
+
+
+  pageTitle.textContent =
+    titles[page] ||
+    'Home';
+
+}
+
+
+function switchToPage(page) {
+
+  Object
+    .entries(pages)
+    .forEach(
+      ([name, element]) => {
+
+        element.style.display =
+          name === page
+            ? 'block'
+            : 'none';
+
+      }
+    );
+
+
+  setNavActive(page);
+
+  updatePageTitle(page);
+
+
+  if (
+    page ===
+    'attendance'
+  ) {
+
+    renderCurrentAttendancePage();
+
+  }
+
+
+  if (
+    page ===
+    'about'
+  ) {
+
+    renderAboutPage();
+
+  }
+
+
+  if (
+    page ===
+    'history'
+  ) {
+
+    loadHistory();
+
+  }
+
+}
+
+
+document
+  .querySelectorAll(
+    '.nav-item'
+  )
+  .forEach(button => {
+
+    button.addEventListener(
+      'click',
+      () => {
+
+        switchToPage(
+          button.dataset.page
+        );
+
+      }
+    );
+
+  });
+
+
+document
+  .querySelectorAll(
+    '.home-nav-btn'
+  )
+  .forEach(button => {
+
+    button.addEventListener(
+      'click',
+      () => {
+
+        switchToPage(
+          button.dataset.target
+        );
+
+      }
+    );
+
+  });
+
+
+
+/* =========================================================
+   AUTH
+========================================================= */
+
+watchAuth(
+  async (
+    user,
+    role
+  ) => {
+
+    if (!user) {
+
+      window.location.href =
+        'index.html';
+
+      return;
+
+    }
+
+
+    if (
+      role !==
+      'teacher'
+    ) {
+
+      window.location.href =
+        'index.html';
+
+      return;
+
+    }
+
+
+    currentUser =
+      user;
+
+    currentRole =
+      role;
+
+
+    teacherEmail.textContent =
+      user.email ||
+      'Teacher';
+
+
+    document.getElementById(
+      'aboutUserEmail'
+    ).textContent =
+      user.email ||
+      '—';
+
+
+    document.getElementById(
+      'aboutUserUid'
+    ).textContent =
+      user.uid ||
+      '—';
+
+
+    document.getElementById(
+      'aboutUserRole'
+    ).textContent =
+      role ||
+      'Teacher';
+
+
+    document.getElementById(
+      'aboutTeacherId'
+    ).textContent =
+      user.uid ||
+      '—';
+
+
+    document.getElementById(
+      'aboutTeacherEmail'
+    ).textContent =
+      user.email ||
+      '—';
+
+
+    await restoreActiveSession();
+
+
+    switchToPage(
+      'home'
+    );
+
+  }
+);
+
+
+
+/* =========================================================
+   START SESSION
+========================================================= */
+
+document
+  .getElementById(
+    'startBtn'
+  )
+  .addEventListener(
+    'click',
+    async () => {
+
+      startError.style.display =
+        'none';
+
+
+      const courseId =
+        document
+          .getElementById(
+            'courseId'
+          )
+          .value
+          .trim();
+
+
+      const rows =
+        Number(
+          document
+            .getElementById(
+              'rows'
+            )
+            .value
+        );
+
+
+      const benches =
+        Number(
+          document
+            .getElementById(
+              'benches'
+            )
+            .value
+        );
+
+
+      if (!courseId) {
+
+        startError.textContent =
+          'Enter a course ID.';
+
+        startError.style.display =
+          'block';
+
+        return;
+
+      }
+
+
+      if (
+        !Number.isInteger(rows) ||
+        rows < 1 ||
+        !Number.isInteger(benches) ||
+        benches < 1
+      ) {
+
+        startError.textContent =
+          'Rows and benches must be valid numbers.';
+
+        startError.style.display =
+          'block';
+
+        return;
+
+      }
+
+
+      const button =
+        document.getElementById(
+          'startBtn'
+        );
+
+
+      button.disabled =
+        true;
+
+      button.textContent =
+        'Starting...';
+
+
+      try {
+
+        const sessionId =
+          await startSession(
+            courseId,
+            rows,
+            benches
+          );
+
+
+        currentSessionId =
+          sessionId;
+
+
+        await loadCurrentSession();
+
+
+        switchToPage(
+          'dashboard'
+        );
+
+      } catch (error) {
+
+        console.error(
+          'Start session error:',
+          error
+        );
+
+
+        startError.textContent =
+          error.message ||
+          'Could not start session.';
+
+        startError.style.display =
+          'block';
+
+      } finally {
+
+        button.disabled =
+          false;
+
+        button.textContent =
+          'Start Session';
+
+      }
+
+    }
+  );
+
+
+
+/* =========================================================
+   RESTORE ACTIVE SESSION
+========================================================= */
+
+async function restoreActiveSession() {
+
+  try {
+
+    const sessions =
+      await getTeacherSessions();
+
+
+    const activeSession =
+      sessions.find(
+        session =>
+          session.status ===
+          'active'
+      );
+
+
+    if (!activeSession) {
+
+      resetCurrentSessionState();
+
+      return;
+
+    }
+
+
+    currentSessionId =
+      activeSession.id;
+
+
+    await loadCurrentSession();
+
+  } catch (error) {
+
+    console.error(
+      'Restore session error:',
+      error
+    );
+
+    resetCurrentSessionState();
+
+  }
+
+}
+
+
+
+/* =========================================================
+   LOAD CURRENT SESSION
+========================================================= */
+
+async function loadCurrentSession() {
+
+  if (!currentSessionId) {
+
+    showStartScreen();
+
+    return;
+
+  }
+
+
+  try {
+
+    const sessionSnap =
+      await getDoc(
+        doc(
+          db,
+          'sessions',
+          currentSessionId
+        )
+      );
+
+
+    if (!sessionSnap.exists()) {
+
+      resetCurrentSessionState();
+
+      return;
+
+    }
+
+
+    currentSession = {
+
+      id:
+        sessionSnap.id,
+
+      ...sessionSnap.data()
+
+    };
+
+
+    if (
+      currentSession.status !==
+      'active'
+    ) {
+
+      resetCurrentSessionState();
+
+      return;
+
+    }
+
+
+    currentRoster =
+      Array.isArray(
+        currentSession.rosterIds
+      )
+        ? currentSession.rosterIds
+        : [];
+
+
+    attendanceMap = {};
+
+    claimsMap = {};
+
+    provisionalWrites.clear();
+
+    selectedCollision =
+      null;
+
+
+    showLiveSession();
+
+
+    startAttendanceListener();
+
+    startClaimsListener();
+
+
+    await loadRoster();
+
+    await loadAboutStudents();
+
+
+    updateAttendanceStats();
+
+    updateClaimCount();
+
+    renderClassroomGrid();
+
+    renderManualAttendance();
+
+    renderCurrentAttendancePage();
+
+    renderAboutPage();
+
+  } catch (error) {
+
+    console.error(
+      'Load current session error:',
+      error
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+function resetCurrentSessionState() {
+
+  cleanupListeners();
+
+
+  currentSessionId =
+    null;
+
+
+  currentSession =
+    null;
+
+
+  currentRoster =
+    [];
+
+
+  attendanceMap =
+    {};
+
+
+  claimsMap =
+    {};
+
+
+  provisionalWrites.clear();
+
+
+  selectedCollision =
+    null;
+
+
+  hideCollision();
+
+
+  showStartScreen();
+
+
+  renderCurrentAttendancePage();
+
+  renderAboutPage();
+
+}
+
+
+
+/* =========================================================
+   SHOW START
+========================================================= */
+
+function showStartScreen() {
+
+  startCard.style.display =
+    'block';
+
+
+  liveSection.style.display =
+    'none';
+
+
+  sessionIdDisplay.textContent =
+    '';
+
+
+  liveCourse.textContent =
+    'Attendance';
+
+
+  presentCount.textContent =
+    '0';
+
+
+  totalCount.textContent =
+    currentRoster.length;
+
+
+  claimCount.textContent =
+    '0';
+
+
+  classroomGrid.innerHTML =
+    '';
+
+
+  manualAttendance.innerHTML =
+    '';
+
+}
+
+
+
+/* =========================================================
+   SHOW LIVE
+========================================================= */
+
+function showLiveSession() {
+
+  startCard.style.display =
+    'none';
+
+
+  liveSection.style.display =
+    'block';
+
+
+  sessionIdDisplay.textContent =
+    currentSessionId ||
+    '';
+
+
+  liveCourse.textContent =
+    currentSession?.courseId ||
+    'Attendance';
+
+
+  totalCount.textContent =
+    currentRoster.length;
+
+}
+
+
+
+/* =========================================================
+   CLAIM LISTENER
+========================================================= */
+
+function startClaimsListener() {
+
+  if (!currentSessionId) {
+    return;
+  }
+
+
+  if (unsubscribeClaims) {
+
+    unsubscribeClaims();
+
+    unsubscribeClaims =
+      null;
+
+  }
+
+
+  unsubscribeClaims =
+    listenForClaims(
+      currentSessionId,
+      claimsByGrid => {
+
+        claimsMap =
+          claimsByGrid ||
+          {};
+
+
+        console.log(
+          'LIVE CLAIMS:',
+          claimsMap
+        );
+
+
+        processClaims();
+
+
+        updateClaimCount();
+
+
+        renderClassroomGrid();
+
+      }
+    );
+
+}
+
+
+
+/* =========================================================
+   PROCESS CLAIMS
+========================================================= */
+
+function processClaims() {
+
+  if (!currentSessionId) {
+    return;
+  }
+
+
+  let firstCollision =
+    null;
+
+
+  Object.entries(
+    claimsMap
+  ).forEach(
+    ([gridId, claims]) => {
+
+      if (
+        !Array.isArray(
+          claims
+        ) ||
+        claims.length ===
+        0
+      ) {
+
+        return;
+
+      }
+
+
+      if (
+        claims.length > 1
+      ) {
+
+        if (!firstCollision) {
+
+          firstCollision = {
+
+            gridId,
+
+            studentIds:
+              claims
+                .map(
+                  claim =>
+                    claim.studentId
+                )
+                .filter(Boolean)
+
+          };
+
+        }
+
+        return;
+
+      }
+
+
+      const studentId =
+        claims[0]?.studentId;
+
+
+      if (!studentId) {
+        return;
+      }
+
+
+      const existing =
+        attendanceMap[
+          studentId
+        ];
+
+
+      if (
+        existing?.status
+      ) {
+
+        return;
+
+      }
+
+
+      const writeKey =
+        `${currentSessionId}:${studentId}:${gridId}`;
+
+
+      if (
+        provisionalWrites.has(
+          writeKey
+        )
+      ) {
+
+        return;
+
+      }
+
+
+      provisionalWrites.add(
+        writeKey
+      );
+
+
+      markProvisionalPresent(
+        currentSessionId,
+        studentId,
+        gridId
+      )
+        .then(
+          () => {
+
+            console.log(
+              'Attendance written:',
+              studentId,
+              gridId
+            );
+
+          }
+        )
+        .catch(
+          error => {
+
+            provisionalWrites.delete(
+              writeKey
+            );
+
+            console.error(
+              'Attendance write error:',
+              error
+            );
+
+          }
+        );
+
+    }
+  );
+
+
+  if (
+    firstCollision
+  ) {
+
+    selectedCollision =
+      firstCollision;
+
+
+    showCollision(
+      firstCollision.gridId,
+      claimsMap[
+        firstCollision.gridId
+      ] || []
+    );
+
+  } else {
+
+    hideCollision();
+
+  }
+
+}
+
+
+
+/* =========================================================
+   ATTENDANCE LISTENER
+========================================================= */
+
+function startAttendanceListener() {
+
+  if (!currentSessionId) {
+    return;
+  }
+
+
+  if (unsubscribeAttendance) {
+
+    unsubscribeAttendance();
+
+    unsubscribeAttendance =
+      null;
+
+  }
+
+
+  const attendanceRef =
+    collection(
+      db,
+      'sessions',
+      currentSessionId,
+      'attendance'
+    );
+
+
+  unsubscribeAttendance =
+    onSnapshot(
+
+      attendanceRef,
+
+      snapshot => {
+
+        const next =
+          {};
+
+
+        snapshot.forEach(
+          docSnap => {
+
+            next[
+              docSnap.id
+            ] = {
+
+              id:
+                docSnap.id,
+
+              ...docSnap.data()
+
+            };
+
+          }
+        );
+
+
+        attendanceMap =
+          next;
+
+
+        console.log(
+          'LIVE ATTENDANCE:',
+          attendanceMap
+        );
+
+
+        updateAttendanceStats();
+
+        renderClassroomGrid();
+
+        renderManualAttendance();
+
+        renderCurrentAttendancePage();
+
+        processClaims();
+
+      },
+
+      error => {
+
+        console.error(
+          'Attendance listener error:',
+          error
+        );
+
+      }
+
+    );
+
+}
+
+
+
+/* =========================================================
+   COLLISION UI
+========================================================= */
+
+function showCollision(
+  gridId,
+  claims
+) {
+
+  collisionCard.style.display =
+    'flex';
+
+
+  collisionText.textContent =
+    `${claims.length} students claimed ${gridId}. Select the valid student or penalize the collision.`;
+
+
+  collisionActions.innerHTML =
+    '';
+
+
+  claims.forEach(
+    claim => {
+
+      if (!claim.studentId) {
+        return;
+      }
+
+
+      const button =
+        document.createElement(
+          'button'
+        );
+
+
+      button.className =
+        'primary-btn';
+
+
+      button.type =
+        'button';
+
+
+      button.textContent =
+        `Accept ${claim.studentId}`;
+
+
+      button.addEventListener(
+        'click',
+        () =>
+          resolveSelectedCollision(
+            claim.studentId
+          )
+      );
+
+
+      collisionActions.appendChild(
+        button
+      );
+
+    }
+  );
+
+
+  const penalize =
+    document.createElement(
+      'button'
+    );
+
+
+  penalize.className =
+    'danger-btn';
+
+
+  penalize.type =
+    'button';
+
+
+  penalize.textContent =
+    'Penalize all';
+
+
+  penalize.addEventListener(
+    'click',
+    penalizeCollision
+  );
+
+
+  collisionActions.appendChild(
+    penalize
+  );
+
+}
+
+
+
+/* =========================================================
+   RESOLVE COLLISION
+========================================================= */
+
+async function resolveSelectedCollision(
+  selectedStudentId
+) {
+
+  if (
+    !selectedCollision ||
+    !currentSessionId
+  ) {
+
+    return;
+
+  }
+
+
+  const gridId =
+    selectedCollision.gridId;
+
+
+  const studentIds =
+    selectedCollision.studentIds;
+
+
+  try {
+
+    await resolveCollision(
+      currentSessionId,
+      gridId,
+      [selectedStudentId],
+      'dismiss'
+    );
+
+
+    const others =
+      studentIds.filter(
+        id =>
+          id !==
+          selectedStudentId
+      );
+
+
+    if (
+      others.length
+    ) {
+
+      await resolveCollision(
+        currentSessionId,
+        gridId,
+        others,
+        'penalize'
+      );
+
+    }
+
+
+    hideCollision();
+
+
+  } catch (error) {
+
+    console.error(
+      'Collision resolution error:',
+      error
+    );
+
+
+    alert(
+      'Collision resolution failed: ' +
+      (
+        error.message ||
+        'Unknown error'
+      )
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   PENALIZE COLLISION
+========================================================= */
+
+async function penalizeCollision() {
+
+  if (
+    !selectedCollision ||
+    !currentSessionId
+  ) {
+
+    return;
+
+  }
+
+
+  try {
+
+    await resolveCollision(
+      currentSessionId,
+      selectedCollision.gridId,
+      selectedCollision.studentIds,
+      'penalize'
+    );
+
+
+    hideCollision();
+
+  } catch (error) {
+
+    console.error(
+      'Collision penalty error:',
+      error
+    );
+
+
+    alert(
+      'Could not penalize collision: ' +
+      (
+        error.message ||
+        'Unknown error'
+      )
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   HIDE COLLISION
+========================================================= */
+
+function hideCollision() {
+
+  collisionCard.style.display =
+    'none';
+
+
+  collisionActions.innerHTML =
+    '';
+
+
+  selectedCollision =
+    null;
+
+}
+
+
+
+/* =========================================================
+   GRID STUDENT FALLBACK
+========================================================= */
+
+function getStudentForGrid(
+  gridId
+) {
+
+  const claims =
+    claimsMap[
+      gridId
+    ] || [];
+
+
+  if (
+    claims.length ===
+    1 &&
+    claims[0]?.studentId
+  ) {
+
+    return claims[0].studentId;
+
+  }
+
+
+  for (
+    const [
+      studentId,
+      record
+    ] of Object.entries(
+      attendanceMap
+    )
+  ) {
+
+    if (
+      record?.gridId ===
+      gridId
+    ) {
+
+      return studentId;
+
+    }
+
+  }
+
+
+  return null;
+
+}
+
+
+
+/* =========================================================
+   CLASSROOM GRID
+========================================================= */
+
+function renderClassroomGrid() {
+
+  if (!currentSession) {
+    return;
+  }
+
+
+  const rows =
+    Number(
+      currentSession.rows
+    ) || 1;
+
+
+  const benches =
+    Number(
+      currentSession.benches
+    ) || 1;
+
+
+  classroomGrid.innerHTML =
+    '';
+
+
+  for (
+    let row = 1;
+    row <= rows;
+    row++
+  ) {
+
+    for (
+      let bench = 1;
+      bench <= benches;
+      bench++
+    ) {
+
+      const gridId =
+        `R${row}-B${bench}`;
+
+
+      const seat =
+        document.createElement(
+          'div'
+        );
+
+
+      seat.className =
+        'grid-seat';
+
+
+      const claims =
+        claimsMap[
+          gridId
+        ] || [];
+
+
+      let status =
+        'empty';
+
+
+      let studentId =
+        null;
+
+
+      if (
+        claims.length > 1
+      ) {
+
+        status =
+          'collision';
+
+      }
+
+
+      else if (
+        claims.length ===
+        1
+      ) {
+
+        studentId =
+          claims[0]?.studentId;
+
+
+        const record =
+          studentId
+            ? attendanceMap[
+                studentId
+              ]
+            : null;
+
+
+        if (
+          record?.status ===
+          'present'
+        ) {
+
+          status =
+            'present';
+
+        }
+
+        else if (
+          record?.status ===
+          'absent'
+        ) {
+
+          status =
+            'absent';
+
+        }
+
+        else {
+
+          status =
+            'claimed';
+
+        }
+
+      }
+
+
+      else {
+
+        studentId =
+          getStudentForGrid(
+            gridId
+          );
+
+
+        if (studentId) {
+
+          const record =
+            attendanceMap[
+              studentId
+            ];
+
+
+          if (
+            record?.status ===
+            'present'
+          ) {
+
+            status =
+              'present';
+
+          }
+
+          else if (
+            record?.status ===
+            'absent'
+          ) {
+
+            status =
+              'absent';
+
+          }
+
+        }
+
+      }
+
+
+      seat.classList.add(
+        status
+      );
+
+
+      let text =
+        'Empty';
+
+
+      if (
+        status ===
+        'collision'
+      ) {
+
+        text =
+          `${claims.length} claims`;
+
+      }
+
+      else if (
+        studentId
+      ) {
+
+        text =
+          studentId;
+
+      }
+
+      else if (
+        status ===
+        'claimed'
+      ) {
+
+        text =
+          'Claimed';
+
+      }
+
+
+      seat.innerHTML = `
+
+        <strong>
+          ${escapeHtml(
+            gridId
+          )}
+        </strong>
+
+        <small>
+          ${escapeHtml(
+            text
+          )}
+        </small>
+
+      `;
+
+
+      classroomGrid.appendChild(
+        seat
+      );
+
+    }
+
+  }
+
+}
+
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+function updateClaimCount() {
+
+  let count =
+    0;
+
+
+  Object.values(
+    claimsMap
+  ).forEach(
+    claims => {
+
+      if (
+        Array.isArray(
+          claims
+        )
+      ) {
+
+        count +=
+          claims.length;
+
+      }
+
+    }
+  );
+
+
+  claimCount.textContent =
+    count;
+
+}
+
+
+function updateAttendanceStats() {
+
+  const present =
+    Object.values(
+      attendanceMap
+    ).filter(
+      record =>
+        record.status ===
+        'present'
+    ).length;
+
+
+  presentCount.textContent =
+    present;
+
+
+  totalCount.textContent =
+    currentRoster.length;
+
+}
+
+
+
+/* =========================================================
+   ROSTER
+========================================================= */
+
+async function loadRoster() {
+
+  if (!currentSessionId) {
+    return;
+  }
+
+
+  try {
+
+    const sessionSnap =
+      await getDoc(
+        doc(
+          db,
+          'sessions',
+          currentSessionId
+        )
+      );
+
+
+    if (!sessionSnap.exists()) {
+      return;
+    }
+
+
+    currentRoster =
+      Array.isArray(
+        sessionSnap.data()
+          .rosterIds
+      )
+        ? sessionSnap.data().rosterIds
+        : [];
+
+
+    totalCount.textContent =
+      currentRoster.length;
+
+
+    renderManualAttendance();
+
+  } catch (error) {
+
+    console.error(
+      'Roster error:',
+      error
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   MANUAL ATTENDANCE
+========================================================= */
+
+function renderManualAttendance() {
+
+  manualAttendance.innerHTML =
+    '';
+
+
+  if (
+    !currentRoster.length
+  ) {
+
+    manualAttendance.innerHTML =
+      '<p>No students in roster.</p>';
+
+    return;
+
+  }
+
+
+  currentRoster.forEach(
+    studentId => {
+
+      const record =
+        attendanceMap[
+          studentId
+        ];
+
+
+      const status =
+        record?.status ||
+        'not marked';
+
+
+      const row =
+        document.createElement(
+          'div'
+        );
+
+
+      row.className =
+        'manual-student-row';
+
+
+      row.innerHTML = `
+
+        <div class="student-info">
+
+          <strong>
+            ${escapeHtml(
+              studentId
+            )}
+          </strong>
+
+          ${statusPill(
+            status
+          )}
+
+        </div>
+
+
+        <div class="manual-actions">
+
+          <button
+            class="present-btn"
+            type="button"
+          >
+            Present
+          </button>
+
+
+          <button
+            class="absent-btn"
+            type="button"
+          >
+            Absent
+          </button>
+
+        </div>
+
+      `;
+
+
+      row
+        .querySelector(
+          '.present-btn'
+        )
+        .addEventListener(
+          'click',
+          () =>
+            manuallySetAttendance(
+              studentId,
+              'present'
+            )
+        );
+
+
+      row
+        .querySelector(
+          '.absent-btn'
+        )
+        .addEventListener(
+          'click',
+          () =>
+            manuallySetAttendance(
+              studentId,
+              'absent'
+            )
+        );
+
+
+      manualAttendance.appendChild(
+        row
+      );
+
+    }
+  );
+
+}
+
+
+async function manuallySetAttendance(
+  studentId,
+  status
+) {
+
+  if (!currentSessionId) {
+    return;
+  }
+
+
+  try {
+
+    await markManualAttendance(
+      currentSessionId,
+      studentId,
+      status
+    );
+
+  } catch (error) {
+
+    console.error(
+      'Manual attendance error:',
+      error
+    );
+
+
+    alert(
+      'Could not update attendance: ' +
+      (
+        error.message ||
+        'Unknown error'
+      )
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   LIVE ATTENDANCE PAGE
+========================================================= */
+
+function renderCurrentAttendancePage() {
+
+  if (
+    !currentSessionId ||
+    !currentSession
+  ) {
+
+    attendanceSubheading.textContent =
+      'No active class.';
+
+
+    attendanceDetails.innerHTML = `
+
+      <div class="attendance-summary">
+
+        <h3>
+          No active class
+        </h3>
+
+        <p>
+          Start a session to view live attendance.
+        </p>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  attendanceSubheading.innerHTML =
+    `<span class="live-inline">LIVE</span>`;
+
+
+  const roster =
+    currentRoster ||
+    [];
+
+
+  const presentStudents =
+    roster.filter(
+      studentId =>
+        attendanceMap[
+          studentId
+        ]?.status ===
+        'present'
+    );
+
+
+  const absentStudents =
+    roster.filter(
+      studentId =>
+        attendanceMap[
+          studentId
+        ]?.status !==
+        'present'
+    );
+
+
+  let html = `
+
+    <div class="attendance-summary">
+
+      <h3>
+        ${escapeHtml(
+          currentSession.courseId ||
+          'Class'
+        )}
+      </h3>
+
+      <p>
+        Session:
+        ${escapeHtml(
+          currentSessionId
+        )}
+      </p>
+
+      <p>
+        Present:
+        <strong>
+          ${presentStudents.length}
+        </strong>
+        /
+        <strong>
+          ${roster.length}
+        </strong>
+      </p>
+
+    </div>
+
+
+    <div class="attendance-columns">
+
+
+      <div>
+
+        <h4>
+          Present
+        </h4>
+
+        <div class="student-list">
+
+  `;
+
+
+  if (
+    !presentStudents.length
+  ) {
+
+    html +=
+      '<p>No students marked present yet.</p>';
+
+  } else {
+
+    presentStudents.forEach(
+      studentId => {
+
+        const source =
+          attendanceMap[
+            studentId
+          ]?.source ||
+          'live';
+
+
+        html += `
+
+          <div
+            class="attendance-student present-row"
+          >
+
+            <strong>
+              ${escapeHtml(
+                studentId
+              )}
+            </strong>
+
+            <small>
+              ${escapeHtml(
+                source
+              )}
+            </small>
+
+          </div>
+
+        `;
+
+      }
+    );
+
+  }
+
+
+  html += `
+
+        </div>
+
+      </div>
+
+
+      <div>
+
+        <h4>
+          Absent / Not marked
+        </h4>
+
+        <div class="student-list">
+
+  `;
+
+
+  if (
+    !absentStudents.length
+  ) {
+
+    html +=
+      '<p>No absent students.</p>';
+
+  } else {
+
+    absentStudents.forEach(
+      studentId => {
+
+        html += `
+
+          <div
+            class="attendance-student absent-row"
+          >
+
+            <strong>
+              ${escapeHtml(
+                studentId
+              )}
+            </strong>
+
+            <small>
+              ${escapeHtml(
+                attendanceMap[
+                  studentId
+                ]?.status ||
+                'not marked'
+              )}
+            </small>
+
+          </div>
+
+        `;
+
+      }
+    );
+
+  }
+
+
+  html += `
+
+        </div>
+
+      </div>
+
+
+    </div>
+
+  `;
+
+
+  attendanceDetails.innerHTML =
+    html;
+
+}
+
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+async function loadHistory() {
+
+  const historyList =
+    document.getElementById(
+      'historyList'
+    );
+
+
+  historyList.innerHTML =
+    '<div class="loading-box">Loading...</div>';
+
+
+  try {
+
+    const sessions =
+      await getTeacherSessions();
+
+
+    const ended =
+      sessions.filter(
+        session =>
+          session.status ===
+          'ended'
+      );
+
+
+    if (!ended.length) {
+
+      historyList.innerHTML =
+        '<div class="card">No previous classes found.</div>';
+
+      return;
+
+    }
+
+
+    historyList.innerHTML =
+      '';
+
+
+    ended.forEach(
+      session => {
+
+        const card =
+          document.createElement(
+            'div'
+          );
+
+
+        card.className =
+          'card history-card';
+
+
+        const rosterCount =
+          Array.isArray(
+            session.rosterIds
+          )
+            ? session.rosterIds.length
+            : 0;
+
+
+        card.innerHTML = `
+
+          <div class="history-main">
+
+            <div>
+
+              <p class="eyebrow">
+                COMPLETED
+              </p>
+
+              <h3>
+                ${escapeHtml(
+                  session.courseId ||
+                  'Class'
+                )}
+              </h3>
+
+              <p>
+                ${escapeHtml(
+                  formatDate(
+                    session.startedAt
+                  )
+                )}
+              </p>
+
+            </div>
+
+
+            <div class="history-stats">
+
+              Students:
+              ${rosterCount}
+
+            </div>
+
+
+            <button
+              class="view-attendance-btn"
+              type="button"
+            >
+              View Attendance
+            </button>
+
+          </div>
+
+        `;
+
+
+        card
+          .querySelector(
+            '.view-attendance-btn'
+          )
+          .addEventListener(
+            'click',
+            () =>
+              showAttendanceForSession(
+                session.id
+              )
+          );
+
+
+        historyList.appendChild(
+          card
+        );
+
+      }
+    );
+
+  } catch (error) {
+
+    console.error(
+      'History error:',
+      error
+    );
+
+
+    historyList.innerHTML = `
+
+      <div class="card">
+
+        Could not load history.
+
+        <br>
+
+        ${escapeHtml(
+          error.message ||
+          ''
+        )}
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+
+/* =========================================================
+   PREVIOUS CLASS ATTENDANCE
+========================================================= */
+
+async function showAttendanceForSession(
+  sessionId
+) {
+
+  switchToPage(
+    'attendance'
+  );
+
+
+  attendanceSubheading.textContent =
+    'Loading previous class attendance...';
+
+
+  attendanceDetails.innerHTML =
+    '<div class="loading-box">Loading attendance...</div>';
+
+
+  try {
+
+    const sessionSnap =
+      await getDoc(
+        doc(
+          db,
+          'sessions',
+          sessionId
+        )
+      );
+
+
+    if (!sessionSnap.exists()) {
+
+      attendanceDetails.innerHTML = `
+
+        <div class="attendance-summary">
+
+          <h3>
+            Session not found
+          </h3>
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    const session = {
+
+      id:
+        sessionSnap.id,
+
+      ...sessionSnap.data()
+
+    };
+
+
+    /*
+     * IMPORTANT:
+     *
+     * Read the SAME session attendance
+     * collection used during the live class.
+     *
+     * Then also read attendanceLedger.
+     *
+     * Session attendance takes priority.
+     */
+
+    const attendanceSnap =
+      await getDocs(
+        collection(
+          db,
+          'sessions',
+          sessionId,
+          'attendance'
+        )
+      );
+
+
+    const attendanceRecords =
+      {};
+
+
+    attendanceSnap.forEach(
+      docSnap => {
+
+        attendanceRecords[
+          docSnap.id
+        ] = {
+
+          studentId:
+            docSnap.id,
+
+          ...docSnap.data()
+
+        };
+
+      }
+    );
+
+
+    const ledgerSnap =
+      await getDocs(
+        query(
+          collection(
+            db,
+            'attendanceLedger'
+          ),
+          where(
+            'sessionId',
+            '==',
+            sessionId
+          )
+        )
+      );
+
+
+    const ledgerRecords =
+      {};
+
+
+    ledgerSnap.forEach(
+      docSnap => {
+
+        const data =
+          docSnap.data();
+
+
+        if (
+          data.studentId
+        ) {
+
+          ledgerRecords[
+            data.studentId
+          ] = data;
+
+        }
+
+      }
+    );
+
+
+    const roster =
+      Array.isArray(
+        session.rosterIds
+      )
+        ? session.rosterIds
+        : [];
+
+
+    /*
+     * Merge every known student.
+     */
+
+    const studentIds = [
+      ...new Set([
+        ...roster,
+        ...Object.keys(
+          attendanceRecords
+        ),
+        ...Object.keys(
+          ledgerRecords
+        )
+      ])
+    ];
+
+
+    const records =
+      {};
+
+
+    studentIds.forEach(
+      studentId => {
+
+        records[
+          studentId
+        ] =
+          attendanceRecords[
+            studentId
+          ] ||
+          ledgerRecords[
+            studentId
+          ] ||
+          {
+
+            studentId,
+
+            status:
+              'absent'
+
+          };
+
+      }
+    );
+
+
+    const presentStudents =
+      studentIds.filter(
+        studentId =>
+          records[
+            studentId
+          ]?.status ===
+          'present'
+      );
+
+
+    const absentStudents =
+      studentIds.filter(
+        studentId =>
+          records[
+            studentId
+          ]?.status !==
+          'present'
+      );
+
+
+    attendanceSubheading.textContent =
+      `${session.courseId || 'Class'} • ${formatDate(session.startedAt)}`;
+
+
+    let html = `
+
+      <div class="attendance-summary">
+
+        <h3>
+          ${escapeHtml(
+            session.courseId ||
+            'Class'
+          )}
+        </h3>
+
+        <p>
+          Session:
+          ${escapeHtml(
+            sessionId
+          )}
+        </p>
+
+        <p>
+          Present:
+          <strong>
+            ${presentStudents.length}
+          </strong>
+          /
+          <strong>
+            ${studentIds.length}
+          </strong>
+        </p>
+
+        <p>
+          Previous class attendance
+        </p>
+
+      </div>
+
+
+      <div class="attendance-columns">
+
+
+        <div>
+
+          <h4>
+            Present
+          </h4>
+
+          <div class="student-list">
+
+    `;
+
+
+    if (
+      !presentStudents.length
+    ) {
+
+      html +=
+        '<p>No students marked present.</p>';
+
+    } else {
+
+      presentStudents.forEach(
+        studentId => {
+
+          const record =
+            records[
+              studentId
+            ];
+
+
+          html += `
+
+            <div
+              class="attendance-student present-row"
+            >
+
+              <strong>
+                ${escapeHtml(
+                  studentId
+                )}
+              </strong>
+
+              <small>
+                ${escapeHtml(
+                  record?.source ||
+                  'attendance'
+                )}
+              </small>
+
+            </div>
+
+          `;
+
+        }
+      );
+
+    }
+
+
+    html += `
+
+          </div>
+
+        </div>
+
+
+        <div>
+
+          <h4>
+            Absent
+          </h4>
+
+          <div class="student-list">
+
+    `;
+
+
+    if (
+      !absentStudents.length
+    ) {
+
+      html +=
+        '<p>No students marked absent.</p>';
+
+    } else {
+
+      absentStudents.forEach(
+        studentId => {
+
+          const record =
+            records[
+              studentId
+            ];
+
+
+          html += `
+
+            <div
+              class="attendance-student absent-row"
+            >
+
+              <strong>
+                ${escapeHtml(
+                  studentId
+                )}
+              </strong>
+
+              <small>
+                ${escapeHtml(
+                  record?.status ||
+                  'absent'
+                )}
+              </small>
+
+            </div>
+
+          `;
+
+        }
+      );
+
+    }
+
+
+    html += `
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+    `;
+
+
+    attendanceDetails.innerHTML =
+      html;
+
+
+  } catch (error) {
+
+    console.error(
+      'Previous attendance error:',
+      error
+    );
+
+
+    attendanceDetails.innerHTML = `
+
+      <div class="attendance-summary">
+
+        <h3>
+          Could not load attendance
+        </h3>
+
+        <p>
+          ${escapeHtml(
+            error.message ||
+            'Unknown error'
+          )}
+        </p>
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+
+/* =========================================================
+   ABOUT — STUDENTS
+========================================================= */
+
+async function loadAboutStudents() {
+
+  const list =
+    document.getElementById(
+      'aboutStudentsList'
+    );
+
+
+  const summary =
+    document.getElementById(
+      'aboutStudentsSummary'
+    );
+
+
+  if (
+    !currentRoster.length
+  ) {
+
+    summary.textContent =
+      'No students are currently assigned to this active session.';
+
+
+    list.innerHTML = `
+
+      <div class="student-detail-item">
+
+        <strong>
+          No roster loaded
+        </strong>
+
+        <small>
+          Start a class with a course roster to show student details.
+        </small>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  summary.textContent =
+    `${currentRoster.length} student${currentRoster.length === 1 ? '' : 's'} in the current roster.`;
+
+
+  list.innerHTML =
+    '<div class="loading-box">Loading student details...</div>';
+
+
+  const results =
+    [];
+
+
+  for (
+    const studentId
+    of currentRoster
+  ) {
+
+    try {
+
+      const studentSnap =
+        await getDoc(
+          doc(
+            db,
+            'students',
+            studentId
+          )
+        );
+
+
+      results.push({
+
+        studentId,
+
+        data:
+          studentSnap.exists()
+            ? studentSnap.data()
+            : null
+
+      });
+
+    } catch (error) {
+
+      console.error(
+        'Student detail error:',
+        studentId,
+        error
+      );
+
+
+      results.push({
+
+        studentId,
+
+        data:
+          null
+
+      });
+
+    }
+
+  }
+
+
+  list.innerHTML =
+    '';
+
+
+  results.forEach(
+    ({
+      studentId,
+      data
+    }) => {
+
+      const name =
+        data?.name ||
+        data?.fullName ||
+        data?.displayName ||
+        'Name not stored';
+
+
+      const email =
+        data?.email ||
+        data?.mail ||
+        'Email not stored';
+
+
+      const extra =
+        data?.course ||
+        data?.branch ||
+        data?.section ||
+        '';
+
+
+      const item =
+        document.createElement(
+          'div'
+        );
+
+
+      item.className =
+        'student-detail-item';
+
+
+      item.innerHTML = `
+
+        <strong>
+          ${escapeHtml(
+            name
+          )}
+        </strong>
+
+        <small>
+          Student ID / UID:
+          ${escapeHtml(
+            studentId
+          )}
+        </small>
+
+        <small>
+          Email:
+          ${escapeHtml(
+            email
+          )}
+        </small>
+
+        ${
+          extra
+            ? `
+              <small>
+                Details:
+                ${escapeHtml(
+                  extra
+                )}
+              </small>
+            `
+            : ''
+        }
+
+      `;
+
+
+      list.appendChild(
+        item
+      );
+
+    }
+  );
+
+}
+
+
+function renderAboutPage() {
+
+  document.getElementById(
+    'aboutCourse'
+  ).textContent =
+    currentSession?.courseId ||
+    'No active class';
+
+
+  document.getElementById(
+    'aboutSession'
+  ).textContent =
+    currentSessionId ||
+    '—';
+
+
+  if (
+    !currentRoster.length
+  ) {
+
+    document.getElementById(
+      'aboutStudentsSummary'
+    ).textContent =
+      'No active student roster.';
+
+  }
+
+}
+
+
+
+/* =========================================================
+   END SESSION
+========================================================= */
+
+document
+  .getElementById(
+    'endBtn'
+  )
+  .addEventListener(
+    'click',
+    async () => {
+
+      if (!currentSessionId) {
+        return;
+      }
+
+
+      const confirmed =
+        confirm(
+          'End this attendance session?'
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      const button =
+        document.getElementById(
+          'endBtn'
+        );
+
+
+      button.disabled =
+        true;
+
+
+      button.textContent =
+        'Ending...';
+
+
+      try {
+
+        await endSession(
+          currentSessionId
+        );
+
+
+        cleanupListeners();
+
+
+        currentSessionId =
+          null;
+
+
+        currentSession =
+          null;
+
+
+        currentRoster =
+          [];
+
+
+        attendanceMap =
+          {};
+
+
+        claimsMap =
+          {};
+
+
+        provisionalWrites.clear();
+
+
+        selectedCollision =
+          null;
+
+
+        hideCollision();
+
+
+        showStartScreen();
+
+
+        renderCurrentAttendancePage();
+
+
+        renderAboutPage();
+
+
+        await loadHistory();
+
+
+        switchToPage(
+          'dashboard'
+        );
+
+      } catch (error) {
+
+        console.error(
+          'End session error:',
+          error
+        );
+
+
+        alert(
+          'Could not end session: ' +
+          (
+            error.message ||
+            'Unknown error'
+          )
+        );
+
+      } finally {
+
+        button.disabled =
+          false;
+
+
+        button.textContent =
+          'End Session';
+
+      }
+
+    }
+  );
+
+
+
+/* =========================================================
+   CLEANUP
+========================================================= */
+
+function cleanupListeners() {
+
+  if (
+    unsubscribeClaims
+  ) {
+
+    unsubscribeClaims();
+
+    unsubscribeClaims =
+      null;
+
+  }
+
+
+  if (
+    unsubscribeAttendance
+  ) {
+
+    unsubscribeAttendance();
+
+    unsubscribeAttendance =
+      null;
+
+  }
+
+}
+
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+async function doLogout() {
+
+  cleanupListeners();
+
+
+  try {
+
+    await logout();
+
+  } catch (error) {
+
+    console.error(
+      'Logout error:',
+      error
+    );
+
+  }
+
+}
+
+
+document
+  .getElementById(
+    'logoutBtn'
+  )
+  .addEventListener(
+    'click',
+    doLogout
+  );
+
+
+document
+  .getElementById(
+    'homeLogoutBtn'
+  )
+  .addEventListener(
+    'click',
+    doLogout
+  );
+
+
+
+</script>
+<script type="module" src="./qr.js"></script>
+</body>
+</html>

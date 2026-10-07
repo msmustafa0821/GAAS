@@ -1,0 +1,13 @@
+{
+  "name": "gaas-functions",
+  "private": true,
+  "main": "index.js",
+  "engines": {
+    "node": "22"
+  },
+  "dependencies": {
+    "@google/genai": "latest",
+    "firebase-admin": "latest",
+    "firebase-functions": "latest"
+  }
+}

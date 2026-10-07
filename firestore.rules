@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() { return request.auth != null; }
+    function isTeacher()  { return isSignedIn() && request.auth.token.role == 'teacher'; }
+    function isStudent()  { return isSignedIn() && request.auth.token.role == 'student'; }
+    function isSelf(id)   { return isSignedIn() && request.auth.uid == id; }
+
+    match /students/{studentId} {
+      allow read: if isSelf(studentId) || isTeacher();
+      // Only the local admin script (Admin SDK, bypasses rules) creates these.
+      allow create: if false;
+      // Teacher can only ever bump the fraud counter, nothing else.
+      allow update: if isTeacher()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['collisionCount']);
+    }
+
+    match /teachers/{teacherId} {
+      allow read, write: if isSelf(teacherId);
+    }
+
+    match /sessions/{sessionId} {
+      allow read: if isTeacher() || isStudent();
+      allow create: if isTeacher() && request.resource.data.teacherId == request.auth.uid;
+      allow update: if isTeacher() && resource.data.teacherId == request.auth.uid;
+
+      // Component B. One doc per student — overwriting it IS the "exactly
+      // one grid at a time" rule, no cleanup step required.
+      match /gridClaims/{studentId} {
+        allow read: if isTeacher();
+        allow write: if isSelf(studentId)
+          && get(/databases/$(database)/documents/sessions/$(sessionId)).data.status == 'active';
+      }
+
+      match /attendance/{studentId} {
+        allow read: if isTeacher() || isSelf(studentId);
+        allow write: if isTeacher();
+      }
+    }
+
+    match /attendanceLedger/{docId} {
+      allow read: if isTeacher() || (isStudent() && resource.data.studentId == request.auth.uid);
+      allow write: if isTeacher();
+    }
+
+    match /courses/{courseId} {
+      allow read: if isSignedIn();
+      match /roster/{studentId} {
+        allow read: if isTeacher() || isSelf(studentId);
+        allow write: if isTeacher();
+      }
+    }
+  }
+}
