@@ -7,7 +7,7 @@
 import {
   db,
   auth
-} from './Firebaseclient.js';
+} from './firebaseclient.js';
 import {
   getApp,
   initializeApp
